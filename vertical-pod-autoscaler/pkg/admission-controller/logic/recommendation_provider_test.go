@@ -65,6 +65,9 @@ func TestUpdateResourceRequests(t *testing.T) {
 	vpaWithEmptyRecommendation := vpaBuilder.Get()
 	vpaWithEmptyRecommendation.Status.Recommendation = &vpa_types.RecommendedPodResources{}
 
+	vpaWithEmptyStatus := vpaBuilder.Get()
+	vpaWithEmptyStatus.Status = vpa_types.VerticalPodAutoscalerStatus{}
+
 	testCases := []testCase{{
 		pod:            uninitialized,
 		vpas:           []*vpa_types.VerticalPodAutoscaler{vpa},
@@ -118,7 +121,14 @@ func TestUpdateResourceRequests(t *testing.T) {
 	}, {
 		pod:            initialized,
 		vpas:           []*vpa_types.VerticalPodAutoscaler{vpaWithEmptyRecommendation},
-		expectedAction: true,
+		expectedAction: false,
+		expectedMem:    "0",
+		expectedCPU:    "0",
+		memLimit:       "200Mi",
+	}, {
+		pod:            initialized,
+		vpas:           []*vpa_types.VerticalPodAutoscaler{vpaWithEmptyStatus},
+		expectedAction: false,
 		expectedMem:    "0",
 		expectedCPU:    "0",
 		memLimit:       "200Mi",

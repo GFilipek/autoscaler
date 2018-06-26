@@ -126,6 +126,10 @@ func (p *recommendationProvider) GetContainersResourcesForPod(pod *v1.Pod) ([]Co
 		glog.V(2).Infof("no matching VPA found for pod %s", pod.Name)
 		return nil, "", nil
 	}
+	if vpaConfig.Status.Recommendation == nil || len(vpaConfig.Status.Recommendation.ContainerRecommendations) == 0 {
+		glog.V(2).Infof("empty recommendation in VPA for pod %v", pod.Name)
+		return nil, "", nil
+	}
 	recommendedPodResources, err := p.recommendationProcessor.Apply(vpaConfig.Status.Recommendation, vpaConfig.Spec.ResourcePolicy, pod)
 	if err != nil {
 		glog.V(2).Infof("cannot process recommendation for pod %s", pod.Name)
